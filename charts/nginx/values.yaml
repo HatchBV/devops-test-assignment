@@ -1,0 +1,2 @@
+name: nginx
+imageUrl: localhost/my_nginx:latest
