@@ -13,7 +13,9 @@ Encryption, Authentication, Authorization using **two-way TLS** for Kafka broker
 
 * helm version `v3.4.1` (need to be install and configure with minikube)
 
-* Cert-Manager `v1.0.4` with CRDs (will be covered in the init.sh scripit)
+* Cert-Manager `v1.0.4` with CRDs (will be covered in the init.sh script)
+
+* CA Issuer
 
 ## Chart Details
 
@@ -41,6 +43,7 @@ $ helm install kafka charts/kafka
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| caIssuer.name | string | `"ca-issuer"` | Certificate authority issuer CRD created by Cert-Manager |
 | image.pullPolicy | string | `"IfNotPresent"` | Kafka Container pull policy |
 | image.repository | string | `"localhost/my_kafka"` | Kafka Container image |
 | image.tag | string | `"latest"` | Kafka Container image tag |
@@ -56,6 +59,7 @@ $ helm install kafka charts/kafka
 | service.interSecurePort | int | `9094` | Secure TCP port configured to access Kafka per Broker (Headless) |
 | service.port | int | `9092` | TCP port configured at cluster services (used if security is disabled) |
 | service.type | string | `"ClusterIP"` | Service Type (only ClusterIP supported for now). |
+| zookeeper.caIssuer.name | string | `"ca-issuer"` | Certificate authority issuer CRD created by Cert-Manager |
 | zookeeper.image.pullPolicy | string | `"IfNotPresent"` | ZooKeeper Container image |
 | zookeeper.image.repository | string | `"localhost/my_zookeeper"` | ZooKeeper Container image |
 | zookeeper.image.tag | string | `"latest"` | ZooKeeper Container image |

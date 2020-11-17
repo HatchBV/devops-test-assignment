@@ -26,7 +26,7 @@ spec:
     - '{{ include "kafka.fullname" . }}-0.{{ include "kafka.fullname" . }}-headless'
     {{- end }}
   issuerRef:
-    name: ca-issuer
+    name: {{ .Values.caIssuer.name }}
     kind: Issuer
     group: cert-manager.io
 {{- end }}

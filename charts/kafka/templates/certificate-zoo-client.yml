@@ -26,7 +26,7 @@ spec:
     {{- end }}
 
   issuerRef:
-    name: ca-issuer
+    name: {{ .Values.caIssuer.name }}
     kind: Issuer
     group: cert-manager.io
 {{- end }}

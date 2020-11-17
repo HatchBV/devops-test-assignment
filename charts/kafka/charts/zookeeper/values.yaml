@@ -6,6 +6,10 @@ image:
   # -- ZooKeeper Container image
   pullPolicy: IfNotPresent
 
+caIssuer:
+  # -- Certificate authority issuer CARD created by Cert-Manager
+  name: ca-issuer
+
 service:
   # -- Service Type (only ClusterIP supported for now).
   type: ClusterIP

@@ -13,7 +13,9 @@ Encryption, Authentication, Authorization **mTLS** for ZooKeeper will be the **_
 
 * helm version `v3.4.1` (need to be install and configure with minikube)
 
-* Cert-Manager `v1.0.4` with CRDs (will be covered in the init.sh scripit)
+* Cert-Manager `v1.0.4` with CRDs (will be covered in the init.sh script)
+
+* CA Issuer
 
 ## Chart Details
 
