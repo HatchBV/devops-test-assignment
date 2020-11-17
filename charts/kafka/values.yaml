@@ -1,0 +1,31 @@
+image:
+  repository: localhost/my_kafka
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 9092
+  extSecurePort: 9093
+  interSecurePort: 9094
+  headless:
+    enabled: true
+
+persistence:
+  enabled: true
+  size: 1Gi
+
+security:
+  broker:
+    enabled: true
+    acl:
+      extraSuperUsers: "User:CN=KafkaClient"
+    certificate:
+      keystores:
+        password: password
+  zookeeper:
+    enabled: true
+    certificate:
+      keystores:
+        password: password
+

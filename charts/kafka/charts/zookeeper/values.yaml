@@ -1,0 +1,20 @@
+image:
+  repository: localhost/my_zookeeper
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 2181
+  securePort: 2182
+  headless:
+    enabled: true
+
+persistence:
+  enabled: true
+  size: 1Gi
+security:
+  enabled: true
+  certificate:
+    keystores:
+      password: password

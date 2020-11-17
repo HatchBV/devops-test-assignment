@@ -1,0 +1,32 @@
+{{- if .Values.security.broker.enabled }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ include "kafka.fullname" . }}-broker
+spec:
+  secretName: {{ include "kafka.fullname" . }}-broker-cert
+  duration: 2160h # 90d
+  renewBefore: 360h # 15d
+  privateKey:
+    size: 2048
+    algorithm: RSA
+  usages:
+    - client auth
+    - server auth
+  commonName: Broker
+  keystores:
+    jks:
+      create: true
+      passwordSecretRef:
+        key: password
+        name: {{ include "kafka.fullname" . }}-broker-cert-ks-pwd
+  dnsNames:
+    - '{{ include "kafka.fullname" . }}'
+    {{- if .Values.service.headless.enabled }}
+    - '{{ include "kafka.fullname" . }}-0.{{ include "kafka.fullname" . }}-headless'
+    {{- end }}
+  issuerRef:
+    name: ca-issuer
+    kind: Issuer
+    group: cert-manager.io
+{{- end }}

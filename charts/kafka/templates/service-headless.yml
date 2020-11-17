@@ -1,0 +1,23 @@
+{{- if or .Values.service.headless.enabled .Values.security.broker.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "kafka.fullname" . }}-headless
+  labels:
+{{ include "kafka.labels" . | indent 4 }}
+spec:
+  ports:
+    {{- if .Values.security.broker.enabled }}
+    - name: s-inter-broker
+      port: {{ .Values.service.interSecurePort }}
+      targetPort: 9094
+    {{- else }}
+    - name: broker
+      port: {{ .Values.service.port }}
+      targetPort: 9092
+    {{- end }}
+  clusterIP: None
+  selector:
+    app.kubernetes.io/name: {{ include "kafka.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}

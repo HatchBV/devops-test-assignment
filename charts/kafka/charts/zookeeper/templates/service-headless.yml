@@ -1,0 +1,23 @@
+{{- if .Values.service.headless.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "zookeeper.fullname" . }}-headless
+  labels:
+{{ include "zookeeper.labels" . | indent 4 }}
+spec:
+  ports:
+    {{- if .Values.security.enabled }}
+    - name: secure-zk
+      port: {{ .Values.service.securePort }}
+      targetPort: 2182
+    {{- else }}
+    - name: zk
+      port: {{ .Values.service.port }}
+      targetPort: 2181
+    {{- end }}
+  clusterIP: None
+  selector:
+    app.kubernetes.io/name: {{ include "zookeeper.name" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}

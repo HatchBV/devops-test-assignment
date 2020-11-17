@@ -1,0 +1,7 @@
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: {{ include "ca-issuer.fullname" . }}
+spec:
+  ca:
+    secretName: {{ .Values.ca.secretName }}
