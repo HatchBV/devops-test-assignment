@@ -1,0 +1,23 @@
+{{- if .Values.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "test-client.fullname" . }}-test
+data:
+  clientSSL.properties: |
+    security.protocol=SSL
+    ssl.truststore.location=/certs/broker/truststore.jks
+    ssl.truststore.password={{ .Values.certificate.keystores.password }}
+    ssl.keystore.location=/certs/broker/keystore.jks
+    ssl.keystore.password={{ .Values.certificate.keystores.password }}
+  runTest.sh: |
+    #!/bin/bash
+    echo "Pass date as message to kafka"
+    MESSAGE="`date -u`" && \
+    echo "$MESSAGE" | kafka-console-producer.sh --bootstrap-server kafka:9093 --topic test --producer.config /tests/clientSSL.properties && \
+    echo "done"
+    echo "Start consumer, Note consumer will be timeout in 10 sec"
+    kafka-console-consumer.sh --bootstrap-server kafka:9093 --topic test --consumer.config /tests/clientSSL.properties --from-beginning  --timeout-ms 10000
+    echo "Done"
+
+{{- end }}

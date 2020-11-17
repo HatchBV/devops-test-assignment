@@ -1,0 +1,7 @@
+enabled: true
+image: localhost/my_kafka:latest
+caIssuer:
+  name: ca-issuer
+certificate:
+  keystores:
+    password: testPassword

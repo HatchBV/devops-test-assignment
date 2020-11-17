@@ -1,8 +1,8 @@
 #!/bin/bash
 
-helm repo add jetstack https://charts.jetstack.io && \
-  helm repo update && \
-  helm install cert-manager \
+helm3 repo add jetstack https://charts.jetstack.io && \
+  helm3 repo update && \
+  helm3 install cert-manager \
     --namespace cert-manager \
     --version v1.0.4  \
     jetstack/cert-manager \
