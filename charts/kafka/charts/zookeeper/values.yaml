@@ -23,7 +23,7 @@ service:
 
 persistence:
   # -- Use a PVC to persist data
-  enabled: true
+  enabled: false
   # -- Size of data volume
   size: 1Gi
 security:
