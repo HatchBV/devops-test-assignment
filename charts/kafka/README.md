@@ -77,3 +77,8 @@ $ helm install kafka charts/kafka
 To test the **kafka/zookeeper** clusters please check **test-client** chart
 
 ---------------------------------------
+
+### Enhancement
+
+I would recommend installing Reloader `https://github.com/stakater/Reloader` in the Kubernetes cluster and add an annotation to Kafka StatefulSet to check changes in the certificatete secret, so when cert-manager renew the cert, StatefulSet will recreate the pod and pick up the new certificate,
+Note: better to have a cluster of Kafka with PDB so one Kafka broker will be recreated at one time
