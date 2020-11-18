@@ -1,0 +1,50 @@
+image:
+  # -- Kafka Container image
+  repository: localhost/my_kafka
+  # -- Kafka Container image tag
+  tag: latest
+  # -- Kafka Container pull policy
+  pullPolicy: IfNotPresent
+
+caIssuer:
+  # -- Certificate authority issuer CARD created by Cert-Manager
+  name: ca-issuer
+
+service:
+  # -- Service Type (only ClusterIP supported for now).
+  type: ClusterIP
+  # -- TCP port configured at cluster services (used if security is disabled)
+  port: 9092
+  # -- Secure TCP port configured to access Kafka cluster
+  extSecurePort: 9093
+  # -- Secure TCP port configured to access Kafka per Broker (Headless)
+  interSecurePort: 9094
+  headless:
+    # -- Enable headless service (it will be auto enabled is security is enabled)
+    enabled: true
+
+persistence:
+  # -- Use a PVC to persist data
+  enabled: false
+  # -- Size of data volume
+  size: 1Gi
+
+security:
+  broker:
+    # -- Enable Kafka Security ( Two-way TLS, ACL)
+    enabled: true
+    acl:
+      # -- Kafka extra super users to be added to ACL, example "User:CN=a;User:CN=b"
+      extraSuperUsers: "User:CN=KafkaClient"
+    certificate:
+      keystores:
+        # -- Password for the KeyStores for Kafka broker certificate
+        password: KafkaPassword
+  zookeeper:
+    # -- Enable Kafka Secure connection to ZooKeeper ( Two-way TLS, ACL)
+    enabled: true
+    certificate:
+      keystores:
+        # -- Password for the KeyStores for ZooKeeper client certificate
+        password: KafkaZKPassword
+

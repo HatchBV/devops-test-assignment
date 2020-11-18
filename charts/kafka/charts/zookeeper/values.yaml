@@ -1,0 +1,35 @@
+image:
+  # -- ZooKeeper Container image
+  repository: localhost/my_zookeeper
+  # -- ZooKeeper Container image
+  tag: latest
+  # -- ZooKeeper Container image
+  pullPolicy: IfNotPresent
+
+caIssuer:
+  # -- Certificate authority issuer CARD created by Cert-Manager
+  name: ca-issuer
+
+service:
+  # -- Service Type (only ClusterIP supported for now).
+  type: ClusterIP
+  # -- TCP port configured at cluster services (used if security is disabled)
+  port: 2181
+  # -- Secure TCP port configured to access ZooKeeper cluster and for Headless service
+  securePort: 2182
+  headless:
+    # -- Enable headless service (it will be auto enabled is security is enabled)
+    enabled: true
+
+persistence:
+  # -- Use a PVC to persist data
+  enabled: false
+  # -- Size of data volume
+  size: 1Gi
+security:
+  # -- Enable ZooKeeper Security ( mTls )
+  enabled: true
+  certificate:
+    keystores:
+      # -- Password for the KeyStores for ZooKeeper server certificate
+      password: ZooKeeperPassword

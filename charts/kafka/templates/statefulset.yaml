@@ -1,0 +1,147 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "kafka.fullname" . }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "kafka.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  serviceName: {{ include "kafka.fullname" . }}-headless
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "kafka.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            {{- if .Values.security.broker.enabled }}
+            - name: s-inter-broker
+              containerPort: 9094
+              protocol: TCP
+            - name: s-ext-broker
+              containerPort: 9093
+              protocol: TCP
+            {{- else }}
+            - name: broker
+              containerPort: 9092
+              protocol: TCP
+            {{- end }}
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: KAFKA_ZOO_HOST
+              value: '{{ include "kafka.fullname" . }}-zookeeper'
+            - name: KAFKA_ZOO_PORT
+              value: "2181"
+
+            {{- if .Values.security.zookeeper.enabled }}
+            - name: KAFKA_ZOO_SECURE
+              value: "True"
+            - name: KAFKA_ZOO_SECURE_PORT
+              value: "2182"
+            - name: KAFKA_ZOO_SSL_KEYSTORE_LOCATION
+              value: "/certs/zookeeper/keystore.jks"
+            - name: KAFKA_ZOO_SSL_TRUSTSTORE_LOCATION
+              value: "/certs/zookeeper/truststore.jks"
+
+            - name: KAFKA_ZOO_SSL_KEYSTORE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "kafka.fullname" . }}-zoo-client-cert-ks-pwd
+                  key: password
+            - name: KAFKA_ZOO_SSL_TRUSTSTORE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "kafka.fullname" . }}-zoo-client-cert-ks-pwd
+                  key: password
+            {{- end }}
+            {{- if .Values.security.broker.enabled }}
+            - name: KAFKA_SECURE
+              value: "True"
+            - name: KAFKA_SSL_KEYSTORE_LOCATION
+              value: "/certs/broker/keystore.jks"
+            - name: KAFKA_SSL_TRUSTSTORE_LOCATION
+              value: "/certs/broker/truststore.jks"
+            - name: KAFKA_SSL_SERVICE_HEADLESS
+              value: '{{ include "kafka.fullname" . }}-headless'
+            - name: KAFKA_SSL_SERVICE
+              value: '{{ include "kafka.fullname" . }}'
+            - name: KAFKA_ACL_SUPER_USERS
+              value: '{{ .Values.security.broker.acl.extraSuperUsers }}'
+
+            - name: KAFKA_SSL_KEYSTORE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "kafka.fullname" . }}-broker-cert-ks-pwd
+                  key: password
+            - name: KAFKA_SSL_TRUSTSTORE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "kafka.fullname" . }}-broker-cert-ks-pwd
+                  key: password
+            {{- end }}
+
+          volumeMounts:
+            {{- if .Values.security.zookeeper.enabled }}
+            - name: zoo-certs
+              mountPath: "/certs/zookeeper"
+              readOnly: true
+            {{- end }}
+            {{- if .Values.security.broker.enabled }}
+            - name: broker-certs
+              mountPath: "/certs/broker"
+              readOnly: true
+            {{- end }}
+            - name: datadir
+              mountPath: /kafka
+      volumes:
+        {{- if .Values.security.zookeeper.enabled }}
+        - name: zoo-certs
+          secret:
+            secretName: {{ include "kafka.fullname" . }}-zoo-client-cert
+            items:
+              - key: truststore.jks
+                path: truststore.jks
+              - key: keystore.jks
+                path: keystore.jks
+        {{- end }}
+        {{- if .Values.security.broker.enabled }}
+        - name: broker-certs
+          secret:
+            secretName: {{ include "kafka.fullname" . }}-broker-cert
+            items:
+              - key: truststore.jks
+                path: truststore.jks
+              - key: keystore.jks
+                path: keystore.jks
+        {{- end }}
+        {{- if not .Values.persistence.enabled }}
+        - name: datadir
+          emptyDir: {}
+        {{- end }}
+
+  {{- if .Values.persistence.enabled }}
+  volumeClaimTemplates:
+  - metadata:
+      name: datadir
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: {{ .Values.persistence.size }}
+      {{- if .Values.persistence.storageClass }}
+      storageClassName: "{{ .Values.persistence.storageClass }}"
+      {{- end }}
+  {{- end }}

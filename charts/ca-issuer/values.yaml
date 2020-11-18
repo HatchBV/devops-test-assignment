@@ -1,0 +1,3 @@
+ca:
+  # -- Secret resource of type TLS which contain the certificate and the key that will be used as CA
+  secretName: hatch-ca

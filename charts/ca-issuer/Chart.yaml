@@ -1,0 +1,8 @@
+apiVersion: v2
+appVersion: "1.0"
+description: CA Issuer Helm Chart for Kubernetes
+maintainers: 
+  - name: wroujoulah
+    email: w.roujoulah@gmail.com
+name: ca-issuer
+version: 0.1.0

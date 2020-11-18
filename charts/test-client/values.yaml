@@ -1,0 +1,11 @@
+# -- Enable the chart
+enabled: true
+# -- Test client docker image
+image: localhost/my_kafka:latest
+caIssuer:
+  # -- Certificate authority issuer CRD created by Cert-Manager
+  name: ca-issuer
+certificate:
+  keystores:
+    # -- Keystores password
+    password: testPassword

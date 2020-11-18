@@ -1,0 +1,31 @@
+{{- if .Values.security.enabled }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ include "zookeeper.fullname" . }}
+spec:
+  secretName: {{ include "zookeeper.fullname" . }}-cert
+  duration: 2160h # 90d
+  renewBefore: 360h # 15d
+  privateKey:
+    size: 2048
+    algorithm: RSA
+  usages:
+    - server auth
+  commonName: ZooKeeper
+  keystores:
+    jks:
+      create: true
+      passwordSecretRef:
+        key: password
+        name: {{ include "zookeeper.fullname" . }}-cert-ks-pwd
+  dnsNames:
+    - '{{ include "zookeeper.fullname" . }}'
+    {{- if .Values.service.headless.enabled }}
+    - '{{ include "zookeeper.fullname" . }}-0.{{ include "zookeeper.fullname" . }}-headless'
+    {{- end }} 
+  issuerRef:
+    name: {{ .Values.caIssuer.name }}
+    kind: Issuer
+    group: cert-manager.io
+{{- end }}

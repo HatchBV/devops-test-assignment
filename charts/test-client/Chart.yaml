@@ -1,0 +1,7 @@
+apiVersion: v2
+name: test-client
+description: test client chart for kafka/zookeeper in Kubernetes
+maintainers:
+  - name: wroujoulah
+    email: w.roujoulah@gmail.com
+version: 0.1.0

@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "zookeeper.fullname" . }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "zookeeper.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  serviceName: {{ include "zookeeper.fullname" . }}-headless
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "zookeeper.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            {{- if .Values.security.enabled }}
+            - name: ZOO_SECURE
+              value: "True"
+            - name: ZOO_SSL_KEYSTORE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "zookeeper.fullname" . }}-cert-ks-pwd
+                  key: password
+            - name: ZOO_SSL_TRUSTSTORE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "zookeeper.fullname" . }}-cert-ks-pwd
+                  key: password
+            - name: ZOO_SSL_KEYSTORE_LOCATION
+              value: "/certs/keystore.jks"
+            - name: ZOO_SSL_TRUSTSTORE_LOCATION
+              value: "/certs/truststore.jks"
+            {{- end }}
+          ports:
+            {{- if .Values.security.enabled }}
+            - name: secure-zk
+              containerPort: 2182
+              protocol: TCP
+            {{- else }}
+            - name: zk
+              containerPort: 2181
+              protocol: TCP
+            {{- end }}
+          volumeMounts:
+            {{- if .Values.security.enabled }}
+            - name: certs
+              mountPath: "/certs"
+              readOnly: true
+            {{- end }}
+            - name: datadir
+              mountPath: /zookeeper
+      volumes:
+        {{- if .Values.security.enabled }}
+        - name: certs
+          secret:
+            secretName: {{ include "zookeeper.fullname" . }}-cert
+            items:
+              - key: truststore.jks
+                path: truststore.jks
+              - key: keystore.jks
+                path: keystore.jks
+        {{- end }}
+        {{- if not .Values.persistence.enabled }}
+        - name: datadir
+          emptyDir: {}
+        {{- end }}
+  {{- if .Values.persistence.enabled }}
+  volumeClaimTemplates:
+  - metadata:
+      name: datadir
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: {{ .Values.persistence.size }}
+      {{- if .Values.persistence.storageClass }}
+      storageClassName: "{{ .Values.persistence.storageClass }}"
+      {{- end }}
+  {{- end }}

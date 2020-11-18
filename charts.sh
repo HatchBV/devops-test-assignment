@@ -1,6 +1,6 @@
 #!/bin/bash
 
 ls charts/ | while read l ; do
-  helm delete --purge ${l}
-  helm install --namespace default --name ${l} charts/${l}/
+  helm3 uninstall ${l}
+  helm3 install ${l} --namespace default charts/${l}/
 done
