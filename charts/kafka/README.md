@@ -71,3 +71,9 @@ $ helm install kafka charts/kafka
 | zookeeper.service.port | int | `2181` | TCP port configured at cluster services (used if security is disabled) |
 | zookeeper.service.securePort | int | `2182` | Secure TCP port configured to access ZooKeeper cluster and for Headless service |
 | zookeeper.service.type | string | `"ClusterIP"` | Service Type (only ClusterIP supported for now). |
+
+### Testing
+
+To test the **kafka/zookeeper** clusters please check **test-client** chart
+
+---------------------------------------
