@@ -12,12 +12,22 @@ data:
     ssl.keystore.password={{ .Values.certificate.keystores.password }}
   runTest.sh: |
     #!/bin/bash
-    echo "Pass date as message to kafka"
-    MESSAGE="`date -u`" && \
+    MESSAGE="`date -u`"
+    echo "###############################################################################"
+    echo "# Passing $MESSAGE as a message to kafka                  #"
+    echo "# Note, ignore the WARN, when you run the test for the first time             #"
+    echo "# kafka-topics.sh doesn't support tls, so topic not created before producing  #"
+    echo "###############################################################################"
     echo "$MESSAGE" | kafka-console-producer.sh --bootstrap-server kafka:9093 --topic test --producer.config /tests/clientSSL.properties && \
-    echo "done"
-    echo "Start consumer, Note consumer will be timeout in 10 sec"
+    echo "################"
+    echo "# Passind Done #"
+    echo "################"
+    echo "###########################################################"
+    echo "# Start consumer, Note consumer will be timeout in 10 sec #"
+    echo "###########################################################"
     kafka-console-consumer.sh --bootstrap-server kafka:9093 --topic test --consumer.config /tests/clientSSL.properties --from-beginning  --timeout-ms 10000
-    echo "Done"
+    echo "########"
+    echo "# Done #"
+    echo "########"
 
 {{- end }}
